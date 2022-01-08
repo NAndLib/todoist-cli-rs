@@ -1,2 +1,5 @@
 [workspace]
-members = [ "todoist-core", "todoist-plugins" ]
+members = [
+  "todoist-core",
+  "todoist-plugins",
+]
