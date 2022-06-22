@@ -44,5 +44,3 @@ This project has several goals:
 5. Have a CLI app that, if needed, can be extended in a modular way.
 
 The 6th point is really the dream.
-
-# Overview
