@@ -9,10 +9,10 @@
 //! [Todoist Sync API]: https://developer.todoist.com/sync/v8/#overview
 //! [Redis]: https://docs.rs/redis/latest/redis/
 
-/// Core plugin API
-pub mod core;
 /// Redis caching implementation
 pub mod cache;
+/// Core plugin API
+pub mod core;
 
 /// Todoist sync API reqwest client
 pub mod client;

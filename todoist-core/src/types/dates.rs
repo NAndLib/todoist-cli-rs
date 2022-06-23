@@ -18,26 +18,26 @@
 //! ```
 //!
 //! [Todoist Sync API full-day dates]: https://developer.todoist.com/sync/v8/#due-dates
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use tracing;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct DueDate {
     /// Due date in the format of YYYY-MM-DD. For recuring dates, the date of the current
     /// iteration. Default: `No date`.
-    date : String,
+    date: String,
     /// Always set to `null`
-    timezone : String,
+    timezone: String,
     /// Human-readable representation of due date. Default: `No date`.
-    string : String,
+    string: String,
     /// Language which is used to parse the content of the `string` attribute. Default: `en`.
-    lang : String,
+    lang: String,
     /// Set to `true` if the due date is recurring. Default: `false`.
-    is_recurring : bool,
+    is_recurring: bool,
 
     /// Set to `true` if the `DueDate` has no due date. This field must be `true` if `date`,
     /// `string`, and `is_recurring` are all default values.
-    no_date : bool
+    no_date: bool,
 }
 
 impl DueDate {
@@ -51,28 +51,15 @@ impl DueDate {
 /// [here](https://developer.todoist.com/sync/v8/#due-dates).
 struct SupportedLang;
 impl SupportedLang {
-    fn supported_lang() -> Vec< &'static str > {
+    fn supported_lang() -> Vec<&'static str> {
         vec![
-            "en",
-            "da",
-            "pl",
-            "zh",
-            "ko",
-            "de",
-            "pt",
-            "ja",
-            "it",
-            "fr",
-            "sv",
-            "ru",
-            "es",
-            "nl"
+            "en", "da", "pl", "zh", "ko", "de", "pt", "ja", "it", "fr", "sv", "ru", "es", "nl",
         ]
     }
 
-    pub fn check_lang(value : &str) -> Result<(), ()> {
+    pub fn check_lang(value: &str) -> Result<(), ()> {
         if !Self::supported_lang().contains(&value) {
-            return Err(())
+            return Err(());
         }
         Ok(())
     }
@@ -84,11 +71,11 @@ impl SupportedLang {
 
 #[derive(Clone, Default, Debug)]
 pub struct DueDateBuilder {
-    date : Option<String>,
-    string : Option<String>,
-    lang : Option<String>,
-    is_recurring : bool,
-    no_date : bool
+    date: Option<String>,
+    string: Option<String>,
+    lang: Option<String>,
+    is_recurring: bool,
+    no_date: bool,
 }
 
 impl DueDateBuilder {
@@ -96,8 +83,7 @@ impl DueDateBuilder {
     /// found [here](https://todoist.com/help/articles/due-dates-and-times).
     #[tracing::instrument]
     pub fn from_string(&mut self, date_string: &str) -> &mut Self {
-        assert!(false, "Not implemented");
-        self
+        panic!("Not implemented");
     }
 
     /// Set the [DueDate] to have no date, this sets the `date` and `string` fields to "No date"
@@ -122,8 +108,10 @@ impl DueDateBuilder {
         let mut new = self;
         if new.no_date {
             tracing::event!(
-                tracing::Level::WARN, "'no_date' is set, not marking DueDate as recurring");
-            return new
+                tracing::Level::WARN,
+                "'no_date' is set, not marking DueDate as recurring"
+            );
+            return new;
         }
         new.is_recurring = value;
         new
@@ -139,7 +127,10 @@ impl DueDateBuilder {
             Ok(_) => new.lang = Some(value.to_string()),
             Err(_) => {
                 tracing::event!(
-                    tracing::Level::WARN, "Unsupported language {:?}, defaulting to 'en'", value);
+                    tracing::Level::WARN,
+                    "Unsupported language {:?}, defaulting to 'en'",
+                    value
+                );
                 new.lang = Some(SupportedLang::default());
             }
         }
@@ -148,45 +139,35 @@ impl DueDateBuilder {
 
     #[tracing::instrument]
     pub fn build(&self) -> Result<DueDate, &'static str> {
-        Ok(
-            DueDate{
-                date: match self.date {
-                    Some(ref value) => Clone::clone(value),
-                    None => {
-                        match self.no_date {
-                            true => "No date".to_string(),
-                            false => {
-                                return Err("No date given but no_date field is unset")
-                            }
-                        }
-                    }
+        Ok(DueDate {
+            date: match self.date {
+                Some(ref value) => Clone::clone(value),
+                None => match self.no_date {
+                    true => "No date".to_string(),
+                    false => return Err("No date given but no_date field is unset"),
                 },
-                timezone: "null".to_string(),
-                string: match self.string {
-                    Some(ref value) => Clone::clone(value),
-                    None => {
-                        match self.no_date {
-                            true => "No date".to_string(),
-                            false => {
-                                return Err("No date given but no_date field is unset")
-                            }
-                        }
-                    }
+            },
+            timezone: "null".to_string(),
+            string: match self.string {
+                Some(ref value) => Clone::clone(value),
+                None => match self.no_date {
+                    true => "No date".to_string(),
+                    false => return Err("No date given but no_date field is unset"),
                 },
-                lang: match self.lang {
-                    Some(ref value) => Clone::clone(value),
-                    None => "en".to_string()
-                },
-                is_recurring: self.is_recurring,
-                no_date: self.no_date
-            }
-        )
+            },
+            lang: match self.lang {
+                Some(ref value) => Clone::clone(value),
+                None => "en".to_string(),
+            },
+            is_recurring: self.is_recurring,
+            no_date: self.no_date,
+        })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::types::dates::{DueDateBuilder, DueDate, SupportedLang};
+    use crate::types::dates::{DueDate, DueDateBuilder, SupportedLang};
 
     #[test]
     fn builder_from_object_test() {
@@ -194,7 +175,7 @@ mod tests {
 
         match DueDate::builder().no_date(true).build() {
             Ok(value) => assert_eq!(value, expected),
-            Err(e) => panic!("{}", e)
+            Err(e) => panic!("{}", e),
         }
     }
 
@@ -202,13 +183,13 @@ mod tests {
     fn empty_test() {
         match DueDateBuilder::default().build() {
             Ok(_) => panic!("Empty builder should fail"),
-            Err(value) => assert_eq!(value, "No date given but no_date field is unset")
+            Err(value) => assert_eq!(value, "No date given but no_date field is unset"),
         };
     }
 
     #[test]
     fn no_date_test() {
-        let expected = DueDate{
+        let expected = DueDate {
             date: "No date".to_string(),
             timezone: "null".to_string(),
             string: "No date".to_string(),
@@ -216,34 +197,34 @@ mod tests {
             is_recurring: false,
             no_date: true,
         };
-        match DueDateBuilder::default()
-                              .no_date(true)
-                              .build() {
+        match DueDateBuilder::default().no_date(true).build() {
             Ok(value) => assert_eq!(value, expected),
-            Err(e) => panic!("{}", e)
+            Err(e) => panic!("{}", e),
         }
 
         match DueDateBuilder::default()
-                              .is_recurring(true)
-                              .no_date(true)
-                              .build() {
+            .is_recurring(true)
+            .no_date(true)
+            .build()
+        {
             Ok(value) => assert_eq!(value, expected),
-            Err(e) => panic!("{}", e)
+            Err(e) => panic!("{}", e),
         }
 
         match DueDateBuilder::default()
-                              .no_date(true)
-                              .is_recurring(true)
-                              .build() {
+            .no_date(true)
+            .is_recurring(true)
+            .build()
+        {
             Ok(value) => assert_eq!(value, expected),
-            Err(e) => panic!("{}", e)
+            Err(e) => panic!("{}", e),
         }
     }
 
     #[test]
     fn supported_lang_test() {
         for lang in SupportedLang::supported_lang() {
-            let expected = DueDate{
+            let expected = DueDate {
                 date: "No date".to_string(),
                 timezone: "null".to_string(),
                 string: "No date".to_string(),
@@ -254,14 +235,14 @@ mod tests {
 
             match DueDateBuilder::default().no_date(true).lang(lang).build() {
                 Ok(value) => assert_eq!(value, expected),
-                Err(e) => panic!("{}", e)
+                Err(e) => panic!("{}", e),
             }
         }
     }
 
     #[test]
     fn unsupported_lang_test() {
-        let expected = DueDate{
+        let expected = DueDate {
             date: "No date".to_string(),
             timezone: "null".to_string(),
             string: "No date".to_string(),
@@ -270,10 +251,9 @@ mod tests {
             no_date: true,
         };
         for lang in vec!["bla", "foo", "bar"] {
-
             match DueDateBuilder::default().no_date(true).lang(lang).build() {
                 Ok(value) => assert_eq!(value, expected),
-                Err(e) => panic!("{}", e)
+                Err(e) => panic!("{}", e),
             }
         }
     }

@@ -20,20 +20,20 @@
 //! ```
 //!
 //! [Todoist Sync API filters]: https://developer.todoist.com/sync/v8/#filters
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use tracing;
 
 use crate::types::colors::Colors;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Filter {
-    id : u64,
-    name : String,
-    query : String,
-    color : Colors,
-    item_order : u32,
-    is_deleted : bool,
-    is_favorite : bool
+    id: u64,
+    name: String,
+    query: String,
+    color: Colors,
+    item_order: u32,
+    is_deleted: bool,
+    is_favorite: bool,
 }
 
 impl Filter {
@@ -45,13 +45,13 @@ impl Filter {
 
 #[derive(Clone, Default, Debug)]
 pub struct FilterBuilder {
-    id : Option<u64>,
-    name : Option<String>,
-    query : Option<String>,
-    color : Colors,
-    item_order : u32,
-    is_deleted : bool,
-    is_favorite : bool
+    id: Option<u64>,
+    name: Option<String>,
+    query: Option<String>,
+    color: Colors,
+    item_order: u32,
+    is_deleted: bool,
+    is_favorite: bool,
 }
 
 impl FilterBuilder {
@@ -120,88 +120,86 @@ impl FilterBuilder {
     }
 
     pub fn build(&self) -> Result<Filter, &'static str> {
-        Ok(
-            Filter{
-                id: match self.id {
-                    Some(value) => value,
-                    None => {
-                        return Err("No ID set for filter")
-                    }
-                },
-                name: match self.name {
-                    Some(ref value) => Clone::clone(value),
-                    None => {
-                        return Err("No name set for filter")
-                    }
-                },
-                query: match self.query {
-                    Some(ref value) => Clone::clone(value),
-                    None => {
-                        return Err("No query set for filter")
-                    }
-                },
-                color: Clone::clone(&self.color),
-                item_order: self.item_order,
-                is_deleted: self.is_deleted,
-                is_favorite: self.is_favorite
-            }
-        )
+        Ok(Filter {
+            id: match self.id {
+                Some(value) => value,
+                None => return Err("No ID set for filter"),
+            },
+            name: match self.name {
+                Some(ref value) => Clone::clone(value),
+                None => return Err("No name set for filter"),
+            },
+            query: match self.query {
+                Some(ref value) => Clone::clone(value),
+                None => return Err("No query set for filter"),
+            },
+            color: Clone::clone(&self.color),
+            item_order: self.item_order,
+            is_deleted: self.is_deleted,
+            is_favorite: self.is_favorite,
+        })
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::types::filters::{Filter, FilterBuilder};
     use crate::types::colors::Colors;
+    use crate::types::filters::{Filter, FilterBuilder};
 
     #[test]
     fn error_test() {
         match FilterBuilder::default().build() {
             Ok(_) => panic!("Builder with no ID, name, or query should fail"),
-            Err(value) => assert_eq!(value, "No ID set for filter")
+            Err(value) => assert_eq!(value, "No ID set for filter"),
         }
 
         match FilterBuilder::default().id(1).build() {
             Ok(_) => panic!("Builder with no ID, name, or query should fail"),
-            Err(value) => assert_eq!(value, "No name set for filter")
+            Err(value) => assert_eq!(value, "No name set for filter"),
         }
 
         match FilterBuilder::default().id(1).name("foo").build() {
             Ok(_) => panic!("Builder with no ID, name, or query should fail"),
-            Err(value) => assert_eq!(value, "No query set for filter")
+            Err(value) => assert_eq!(value, "No query set for filter"),
         }
 
-        let expected = Filter{
+        let expected = Filter {
             id: 1,
             name: String::from("foo"),
             query: String::from("bar"),
             color: Colors::default(),
             item_order: 0,
             is_deleted: false,
-            is_favorite: false
+            is_favorite: false,
         };
 
-        let actual = FilterBuilder::default().id(1).name("foo").query("bar").build().unwrap();
+        let actual = FilterBuilder::default()
+            .id(1)
+            .name("foo")
+            .query("bar")
+            .build()
+            .unwrap();
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn simple_test() {
-        let expected = Filter{
+        let expected = Filter {
             id: 1,
             name: String::from("foo"),
             query: String::from("bar"),
             color: Colors::Red,
             item_order: 0,
             is_deleted: false,
-            is_favorite: false
+            is_favorite: false,
         };
         let actual = FilterBuilder::default()
-                                    .id(1)
-                                    .name("foo")
-                                    .query("bar")
-                                    .color(Colors::Red)
-                                    .build().unwrap();
+            .id(1)
+            .name("foo")
+            .query("bar")
+            .color(Colors::Red)
+            .build()
+            .unwrap();
 
         assert_eq!(actual, expected)
     }

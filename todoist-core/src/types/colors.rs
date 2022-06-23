@@ -1,5 +1,5 @@
 //! Enum for supported colors
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum Colors {
@@ -22,7 +22,7 @@ pub enum Colors {
     Salmon = 46,
     Charcoal = 47,
     Grey = 48,
-    Taupe = 49
+    Taupe = 49,
 }
 
 impl Default for Colors {
