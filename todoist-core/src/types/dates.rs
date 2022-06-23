@@ -1,9 +1,11 @@
 //! Implements the [Todoist Sync API full-day dates].
 //!
 //! ## Example:
-//! ```rust
-//! Make a due date for tomorrow
-//! let builder = DueDate::builder();
+//! ```should_panic
+//! use todoist_core::types::dates::DueDate;
+//!
+//! // Make a due date for tomorrow
+//! let mut builder = DueDate::builder();
 //!
 //! // Make the a due date recuring
 //! builder.is_recurring(true);
