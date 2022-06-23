@@ -27,7 +27,7 @@ use crate::types::colors::Colors;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Filter {
-    id: u64,
+    id: Option<u64>,
     name: String,
     query: String,
     color: Colors,
@@ -121,10 +121,7 @@ impl FilterBuilder {
 
     pub fn build(&self) -> Result<Filter, &'static str> {
         Ok(Filter {
-            id: match self.id {
-                Some(value) => value,
-                None => return Err("No ID set for filter"),
-            },
+            id: self.id,
             name: match self.name {
                 Some(ref value) => Clone::clone(value),
                 None => return Err("No name set for filter"),
@@ -150,7 +147,7 @@ mod test {
     fn error_test() {
         match FilterBuilder::default().build() {
             Ok(_) => panic!("Builder with no ID, name, or query should fail"),
-            Err(value) => assert_eq!(value, "No ID set for filter"),
+            Err(value) => assert_eq!(value, "No name set for filter"),
         }
 
         match FilterBuilder::default().id(1).build() {
@@ -164,7 +161,7 @@ mod test {
         }
 
         let expected = Filter {
-            id: 1,
+            id: Some(1),
             name: String::from("foo"),
             query: String::from("bar"),
             color: Colors::default(),
@@ -185,7 +182,7 @@ mod test {
     #[test]
     fn simple_test() {
         let expected = Filter {
-            id: 1,
+            id: Some(1),
             name: String::from("foo"),
             query: String::from("bar"),
             color: Colors::Red,
