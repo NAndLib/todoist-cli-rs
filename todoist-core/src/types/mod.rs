@@ -7,6 +7,7 @@ pub mod filters;
 pub mod items;
 pub mod labels;
 pub mod notes;
+pub mod priority;
 pub mod projects;
 pub mod sections;
 pub mod user;

@@ -139,7 +139,7 @@ impl FilterBuilder {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::types::colors::Colors;
     use crate::types::filters::{Filter, FilterBuilder};
 

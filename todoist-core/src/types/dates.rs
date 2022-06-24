@@ -21,7 +21,7 @@
 use serde::{Deserialize, Serialize};
 use tracing;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DueDate {
     /// Due date in the format of YYYY-MM-DD. For recuring dates, the date of the current
     /// iteration. Default: `No date`.
@@ -44,6 +44,12 @@ impl DueDate {
     /// [DueDate]s should only be built using the [DueDateBuilder]
     pub fn builder() -> DueDateBuilder {
         DueDateBuilder::default()
+    }
+}
+
+impl Default for DueDate {
+    fn default() -> Self {
+        Self::builder().no_date(true).build().unwrap()
     }
 }
 
