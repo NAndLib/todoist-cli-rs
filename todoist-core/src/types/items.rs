@@ -3,6 +3,32 @@
 //! Currently, the type does not support collaborative projects and items.
 //!
 //! ## Example
+//! ```
+//! use todoist_core::types::items::Item;
+//! // Make a new ItemBuilder
+//! let mut builder = Item::builder();
+//! builder.id(1); // unnecessary for new items, however, needed to use `to_builder`.
+//! builder.user_id(1);
+//! builder.project_id(1);
+//! builder.content("Foo bar baz");
+//! builder.date_added("Today");
+//!
+//! // Add labels
+//! builder.label_add(1);
+//! builder.label_add(2);
+//!
+//! // Create the Item
+//! let item = builder.build().unwrap();
+//!
+//! // ...
+//!
+//! // Make a builder from existing Item to edit it
+//! let mut builder = item.to_builder().unwrap();
+//! builder.checked(true);
+//! builder.date_completed("Today");
+//!
+//! let item = builder.build();
+//! ```
 //!
 //! [Todoist Sync API items or tasks]: https://developer.todoist.com/sync/v8/#items
 use serde::{Deserialize, Serialize};
